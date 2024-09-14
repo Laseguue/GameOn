@@ -1,180 +1,156 @@
-// DOM Elements
-const modalbg = document.querySelector(".bground");
-const modalBtn = document.querySelectorAll(".modal-btn");
-const closeModalBtn = document.querySelector(".close"); // Sélectionne le bouton de fermeture
-const formData = document.querySelectorAll(".formData");
-const form = document.querySelector("form[name='reserve']");
-const submitButton = form.querySelector(".btn-submit");
+// === Sélection des éléments du DOM ===
+const modalbg = document.querySelector(".bground"); // Contexte d'arrière-plan de la modale
+const modalBtn = document.querySelectorAll(".modal-btn"); // Boutons pour ouvrir la modale
+const closeModalBtn = document.querySelector(".close"); // Bouton pour fermer la modale
+const form = document.querySelector("form[name='reserve']"); // Formulaire principal
+const formData = document.querySelectorAll(".formData"); // Conteneurs des champs du formulaire
+const submitButton = form.querySelector(".btn-submit"); // Bouton de soumission du formulaire
 
-const prenomInput = document.getElementById('first');
-const prenomWrapper = document.getElementById('prenomWrapper');
-const nomInput = document.getElementById('last');
-const nomWrapper = document.getElementById('nomWrapper');
-const emailInput = document.getElementById('email');
-const emailWrapper = document.getElementById('emailWrapper');
-const birthdateInput = document.getElementById('birthdate');
-const dateWrapper = document.getElementById('dateWrapper');
+// Champs du formulaire
+const prenomInput = document.getElementById('first'); // Champ "Prénom"
+const prenomWrapper = document.getElementById('prenomWrapper'); // Conteneur du champ "Prénom"
+const nomInput = document.getElementById('last'); // Champ "Nom"
+const nomWrapper = document.getElementById('nomWrapper'); // Conteneur du champ "Nom"
+const emailInput = document.getElementById('email'); // Champ "Email"
+const emailWrapper = document.getElementById('emailWrapper'); // Conteneur du champ "Email"
+const birthdateInput = document.getElementById('birthdate'); // Champ "Date de naissance"
+const dateWrapper = document.getElementById('dateWrapper'); // Conteneur du champ "Date de naissance"
+const quantityInput = document.getElementById('quantity'); // Champ "Quantité de tournois"
+const quantityWrapper = quantityInput.closest(".formData"); // Conteneur du champ "Quantité"
+const locationWrapper = document.querySelector(".formData input[name='location']").closest(".formData"); // Conteneur du champ "Location"
+const termsCheckbox = document.getElementById('checkbox1'); // Checkbox des conditions d'utilisation
+const termsWrapper = termsCheckbox.closest(".formData"); // Conteneur de la checkbox
 
-const quantityInput = document.getElementById('quantity');
-const quantityWrapper = quantityInput.closest(".formData");
+// Création du message de confirmation
+const confirmationMessage = document.createElement('div'); // Création d'un élément pour le message de confirmation
+confirmationMessage.classList.add('confirmation-message'); // Ajout de la classe pour le style
+confirmationMessage.innerHTML = "Merci pour<br>votre inscription"; // Contenu du message de confirmation
+confirmationMessage.style.display = "none"; // Masqué par défaut
+form.appendChild(confirmationMessage); // Ajout du message de confirmation au formulaire
 
-const locationWrapper = document.querySelector(".formData input[name='location']").closest(".formData");
-const termsCheckbox = document.getElementById('checkbox1');
-const termsWrapper = termsCheckbox.closest(".formData");
 
-const confirmationMessage = document.createElement('div');
-confirmationMessage.classList.add('confirmation-message');
-confirmationMessage.innerHTML = "Merci pour<br>votre inscription";
-confirmationMessage.style.display = "none"; // Masquer initialement
-form.appendChild(confirmationMessage); // Ajouter le message au formulaire
-
-// launch modal event
-modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
-
-// launch modal form
+// === Fonctions de gestion de la modale ===
 function launchModal() {
-  modalbg.style.display = "block";
+  modalbg.style.display = "block"; // Afficher la modale
 }
 
-// close modal function
 function closeModal() {
-  modalbg.style.display = "none";
+  modalbg.style.display = "none"; // Cacher la modale
 }
 
-// Add event listener to close button
-closeModalBtn.addEventListener("click", closeModal);
+// === Fonctions de validation ===
+// Fonction générique pour masquer les erreurs
+function setErrorVisibility(wrapper, isVisible, message = '') {
+  wrapper.setAttribute('data-error-visible', isVisible.toString()); // Définir la visibilité de l'erreur
+  if (message) wrapper.setAttribute('data-error', message); // Ajouter le message d'erreur s'il y en a un
+}
 
-// Validation Prénom
+// Validation du champ "Prénom"
 function validatePrenom() {
-  const prenomValue = prenomInput.value;
-  if (prenomValue.length >= 2) {
-    prenomWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    prenomWrapper.setAttribute('data-error-visible', 'true');
-  }
+  const isValid = prenomInput.value.length >= 2; // Vérifier si la longueur est suffisante
+  setErrorVisibility(prenomWrapper, !isValid); // Afficher ou masquer l'erreur
 }
-prenomInput.addEventListener('blur', validatePrenom);
-prenomInput.addEventListener('input', validatePrenom);
 
-// Validation Nom
+// Validation du champ "Nom"
 function validateNom() {
-  const nomValue = nomInput.value;
-  if (nomValue.length >= 2) {
-    nomWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    nomWrapper.setAttribute('data-error-visible', 'true');
-  }
+  const isValid = nomInput.value.length >= 2; // Vérifier si la longueur est suffisante
+  setErrorVisibility(nomWrapper, !isValid); // Afficher ou masquer l'erreur
 }
-nomInput.addEventListener('blur', validateNom);
-nomInput.addEventListener('input', validateNom);
 
-// Validation Email
+// Validation du champ "Email"
 function isValidEmail(email) {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailPattern.test(email);
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex pour vérifier le format de l'email
+  return emailPattern.test(email); // Retourner true si le format est correct
 }
 
 function validateEmail() {
-  const emailValue = emailInput.value;
-  if (isValidEmail(emailValue)) {
-    emailWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    emailWrapper.setAttribute('data-error-visible', 'true');
-  }
+  const isValid = isValidEmail(emailInput.value); // Vérifier si l'email est valide
+  setErrorVisibility(emailWrapper, !isValid); // Afficher ou masquer l'erreur
 }
-emailInput.addEventListener('blur', validateEmail);
-emailInput.addEventListener('input', validateEmail);
 
-// Validation de la date de naissance
+// Validation du champ "Date de naissance"
 function validateDate() {
-  const birthdateValue = birthdateInput.value;
-  if (birthdateValue) {
-    // Si une date est présente
-    dateWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    // Si le champ est vide ou incorrect
-    dateWrapper.setAttribute('data-error-visible', 'true');
-  }
+  const isValid = birthdateInput.value !== ''; // Vérifier si une date est renseignée
+  setErrorVisibility(dateWrapper, !isValid); // Afficher ou masquer l'erreur
 }
 
-// Ajouter les événements 'blur' et 'input' pour valider la date
-birthdateInput.addEventListener('blur', validateDate);
-birthdateInput.addEventListener('input', validateDate);
-
-// Validation du champ "À combien de tournois"
+// Validation du champ "Quantité de tournois"
 function validateQuantity() {
-  const quantityValue = quantityInput.value;
-  if (quantityValue !== '') {
-    quantityWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    quantityWrapper.setAttribute('data-error-visible', 'true');
-    quantityWrapper.setAttribute('data-error', 'Ce champ ne peut pas être vide.');
-  }
+  const isValid = quantityInput.value !== ''; // Vérifier si le champ n'est pas vide
+  setErrorVisibility(quantityWrapper, !isValid, 'Ce champ ne peut pas être vide.'); // Afficher ou masquer l'erreur
 }
 
-// Ajouter les événements 'blur' et 'input' pour valider la quantité
-quantityInput.addEventListener('blur', validateQuantity);
-quantityInput.addEventListener('input', validateQuantity);
-
-// Validation du choix multiple (location)
+// Validation des choix multiples (location)
 function validateLocation() {
-  const locationSelected = document.querySelector("input[name='location']:checked");
-  if (locationSelected) {
-    locationWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    locationWrapper.setAttribute('data-error-visible', 'true');
-    locationWrapper.setAttribute('data-error', 'Vous devez choisir une option.');
-  }
+  const isValid = document.querySelector("input[name='location']:checked"); // Vérifier si une option est sélectionnée
+  setErrorVisibility(locationWrapper, !isValid, 'Vous devez choisir une option.'); // Afficher ou masquer l'erreur
 }
 
 // Validation des conditions d'utilisation
 function validateTerms() {
-  if (termsCheckbox.checked) {
-    termsWrapper.setAttribute('data-error-visible', 'false');
-  } else {
-    termsWrapper.setAttribute('data-error-visible', 'true');
-    termsWrapper.setAttribute('data-error', 'Vous devez vérifier que vous acceptez les termes et conditions.');
-  }
+  const isValid = termsCheckbox.checked; // Vérifier si la case est cochée
+  setErrorVisibility(termsWrapper, !isValid, 'Vous devez vérifier que vous acceptez les termes et conditions.'); // Afficher ou masquer l'erreur
 }
 
-// Modifiez la fonction de soumission pour valider les nouvelles conditions
-form.addEventListener("submit", function(e) {
-  e.preventDefault(); // Empêche l'envoi réel du formulaire
-
-  // Appel des nouvelles fonctions de validation
-  validateLocation();
-  validateTerms();
-  validateQuantity();
-  
-  // Validation des autres champs
+// === Fonction de validation globale du formulaire ===
+function validateForm() {
+  // Appel de toutes les fonctions de validation
   validatePrenom();
   validateNom();
   validateEmail();
   validateDate();
+  validateQuantity();
+  validateLocation();
+  validateTerms();
+}
 
-  // Vérifier si toutes les validations sont correctes
+// === Gestion de la soumission du formulaire ===
+form.addEventListener("submit", function(e) {
+  e.preventDefault(); // Empêcher l'envoi du formulaire pour effectuer des validations
+
+  validateForm(); // Valider tous les champs
+
+  // Vérifier s'il y a des erreurs dans le formulaire
   const errors = document.querySelectorAll('[data-error-visible="true"]');
-  if (errors.length === 0) {
-    // Cacher les champs du formulaire tout en les laissant dans le DOM
+  if (errors.length === 0) { // S'il n'y a pas d'erreurs
+    // Masquer les champs du formulaire
     formData.forEach(data => {
-      data.style.visibility = "hidden"; // Cache les éléments mais conserve l'espace
+      data.style.visibility = "hidden"; // Masquer les éléments du formulaire sans les supprimer
     });
 
-    // Cacher le bouton de soumission
+    // Masquer le bouton de soumission
     if (submitButton) submitButton.style.visibility = "hidden";
 
     // Afficher le message de confirmation
-    confirmationMessage.style.display = "block";
-    confirmationMessage.style.position = "absolute";
+    confirmationMessage.style.display = "block"; // Afficher le message de confirmation
+    confirmationMessage.style.position = "absolute"; // Positionnement absolu pour centrer le message
     confirmationMessage.style.top = "50%";
     confirmationMessage.style.left = "50%";
     confirmationMessage.style.transform = "translate(-50%, -50%)"; // Centrer le message
   }
 });
 
-// Écouteurs pour la validation des champs lors du changement
+// === Écouteurs d'événements ===
+// Écouteurs pour l'ouverture et la fermeture de la modale
+modalBtn.forEach((btn) => btn.addEventListener("click", launchModal)); // Ajouter l'écouteur d'événement à chaque bouton
+closeModalBtn.addEventListener("click", closeModal); // Écouteur d'événement pour fermer la modale
+
+// Écouteurs d'événements pour les champs du formulaire (validation)
+prenomInput.addEventListener('blur', validatePrenom);
+prenomInput.addEventListener('input', validatePrenom);
+nomInput.addEventListener('blur', validateNom);
+nomInput.addEventListener('input', validateNom);
+emailInput.addEventListener('blur', validateEmail);
+emailInput.addEventListener('input', validateEmail);
+birthdateInput.addEventListener('blur', validateDate);
+birthdateInput.addEventListener('input', validateDate);
+quantityInput.addEventListener('blur', validateQuantity);
+quantityInput.addEventListener('input', validateQuantity);
+
+// Écouteurs pour les choix multiples (location)
 document.querySelectorAll("input[name='location']").forEach(input => {
-  input.addEventListener('change', validateLocation);
+  input.addEventListener('change', validateLocation); // Valider lors de la sélection d'une option
 });
 
-termsCheckbox.addEventListener('change', validateTerms);
+// Écouteur pour la case à cocher des conditions d'utilisation
+termsCheckbox.addEventListener('change', validateTerms); // Valider lors du changement d'état de la case
