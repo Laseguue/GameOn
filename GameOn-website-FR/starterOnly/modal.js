@@ -76,8 +76,19 @@ function validateDate() {
 
 // Validation du champ "Quantité de tournois"
 function validateQuantity() {
-  const isValid = quantityInput.value !== ''; // Vérifier si le champ n'est pas vide
-  setErrorVisibility(quantityWrapper, !isValid, 'Ce champ ne peut pas être vide.'); // Afficher ou masquer l'erreur
+  const value = parseInt(quantityInput.value, 10); // Convertir la valeur en entier
+  let isValid = !isNaN(value) && value >= 0; // Vérifier si c'est un nombre et s'il est positif ou nul
+  let errorMessage = '';
+
+  if (quantityInput.value === '') {
+    errorMessage = 'Ce champ ne peut pas être vide.';
+    isValid = false;
+  } else if (value < 0) {
+    errorMessage = 'La quantité ne peut pas être négative.';
+    isValid = false;
+  }
+
+  setErrorVisibility(quantityWrapper, !isValid, errorMessage); // Afficher ou masquer l'erreur
 }
 
 // Validation des choix multiples (location)
@@ -111,11 +122,11 @@ form.addEventListener("submit", function(e) {
   validateForm(); // Valider tous les champs
 
   // Vérifier s'il y a des erreurs dans le formulaire
-  const errors = document.querySelectorAll('[data-error-visible="true"]');
+  const errors = form.querySelectorAll('[data-error-visible="true"]');
   if (errors.length === 0) { // S'il n'y a pas d'erreurs
     // Masquer les champs du formulaire
     formData.forEach(data => {
-      data.style.visibility = "hidden"; // Masquer les éléments du formulaire sans les supprimer
+      data.style.visibility = "hidden"; // Masquer les éléments du formulaire.
     });
 
     // Masquer le bouton de soumission
